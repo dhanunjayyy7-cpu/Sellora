@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="60">
+    <title>FEFO Mandi - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">🌾 FEFO Mandi</div>
+    <div class="live">● Live Inventory</div>
+</header>
+
+<main class="dashboard">
+  
+    {% if summary.red_count > 0 %}
+    <div class="alert">
+        ⚠ <strong>{{ summary.red_count }} batch{% if summary.red_count != 1 %}es{% endif %} need immediate sale</strong>
+    </div>
+    {% else %}
+    <div class="alert safe">
+       ✓ <strong>No batches need immediate sale</strong> 
+    </div>
+    {% endif %}
+
+    <div class="heading">
+        <div>
+            <p>MANDI INVENTORY</p>
+            <h1>FEFO Dashboard</h1>
+            <span>Sell the produce that will expire first.</span>
+        </div>
+
+        <a href="{{ url_for('add') }}" class="add-btn">+ Add Batch</a>
+    </div>
+
+    <section class="summary">
+
+        <div>
+            <small>Total Batches</small>
+            <strong>{{ summary.total_batches }}</strong>
+        </div>
+
+        <div>
+            <small>Total Crates</small>
+            <strong>{{ summary.total_crates }}</strong>
+        </div>
+
+        <div>
+            <small>Sold</small>
+            <strong>{{ summary.sold_crates }}</strong>
+        </div>
+
+        <div>
+            <small>Remaining</small>
+            <strong>{{ summary.sold_crates }}</strong>
+        </div>
+
+    </section>
+
+    <div class="batch-heading">
+        <div>
+            <h2>Active Batches</h2>
+            <span>Lowest score = highest urgency</span>
+        </div>
+
+        <div class="legend">
+            <span>🔴 Immediate</span>
+            <span>🟡 Today</span>
+            <span>🟢 Can Wait</span>
+        </div>
+    </div>
+
+    {% if batches %}
+
+    <section class="batches">
+
+        {% for batch in batches %}
+
+        <article class="batch {{ batch.color|lower }}">
+
+            <div class="batch-main">
+
+                <div class="batch-info">
+                    <small>{{ batch.batch_id }}</small>
+                    <h2>{{ batch.crop_type }}</h2>
+                    <span class="condition">{{ batch.condition }}</span>
+                </div>
+
+                <div class="score">
+                    <small>FEFO SCORE</small>
+                    <strong>{{"%.0f"|format(batch.score) }}</strong>
+                    <span>/100</span>
+                </div>
+
+                <div class="priority">
+                    {% if batch.color|lower == "red" %}
+                    ⚠
+                {% elif batch.color|lower == "yellow" %}
+                    ◷
+                {% else %}
+                    ✓
+                {% endif %}
+                {{ batch.priority }}   
+                </div>
+
+                <div class="details">
+
+                    <div>
+                        <small>QUANTITY</small>
+                        <strong>{{ batch.reamining }} / {{ batch.quantity_total }}</strong>
+                        <span>{{ batch.quantity_sold }} sold</span>
+                    </div>
+
+                    <div>
+                        <small>ARRIVAL</small>
+                        <strong>{{ batch.arrival_time }}</strong>
+                    </div>
+
+                    <div>
+                        <small>TEMPERATURE</small>
+                        <strong>{{ batch.temp }}°C</strong>
+                    </div>
+
+                </div>
+                <div class="actions">
+
+                    {% if batch.reamining > 0 %}
+
+                    <form action="{{ url_for('sell', id=batch.id) }}" method="POST">
+                        <input
+                            type="number"
+                            name="quantity_sold"
+                            min="1"
+                            max="{{ batch.remaining }}"
+                            placeholder="Crates"
+                            required
+                        >
+                        <button type="submit">Sell</button>
+                    </form>
+
+                    {% endif %}
+
+                    <form
+                        action="{{ url_for('delete', id=batch.id) }}"
+                        method="POST"
+                        onsubmit="return confirm('Delete this batch?');"
+                    >
+                        <button type="submit" class="delete">🗑</button>
+                </form>
+
+            </div>
+
+
+            </div>
+
+
+        </article>
+        {% endfor %}
+
+    </section>
+
+    {% else %}
+
+    <div class="empty">
+        <div>📦</div>
+        <h2>No Active Batches</h2>
+        <p>Add a batch to start FEFO tracking.</p>
+        <a href="{{ url_for('add') }}" class="add-btn">+ Add Batch</a>
+    </div>
+
+    {% endif %}
+
+</main>
+
+<footer>
+    FEFO Mandi • First Expired, First Out 
+</footer>
+
+</body>
+</html>
