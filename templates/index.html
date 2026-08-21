@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width", intial-scale="1.0">
+        <title>FEFO Mandi - Add Batch</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+
+<body>
+
+    <header class="topbar">
+        <div class="logo">🌾 FEFO Mandi</div>
+        <a href="{{ url_for('index') }}">Dashboard</a>
+    </header>
+
+    <main class="form-page">
+        <div class="form-box">
+
+            <h1>Add New Batch</h1>
+            <p class="subtitle">Register incoming produce</p>
+
+            <form action="{{ url_for('add') }}" method="POST">
+
+                <label for="crop_type">Crop Type</label>
+                <select name="crop_type" id="crop_type" required>
+                    <option value="" disabled selected>Selected crop</option>
+
+                    {% for crop in crops %}
+                        <option value="{{ crop }}">{{ crop}}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="quantity">Quantity (Crates)</label>
+                <input
+                    type="number"
+                    name="quantity"
+                    id= "quantity"
+                    min="1"
+                    placeholder="Enter number of crates"
+                    required
+                >
+
+                <label for="farm_departure">Fram Departure</label>
+                <input
+                    type="datetime-local"
+                    name="fram_depature"
+                    id="farm_departure"
+                    required
+                >
+
+                <label for="temperature">Temperature at Arrival (°C)</label>
+                <input
+                    type="number"
+                    name="temperature"
+                    id="temperature"
+                    step="0.1"
+                    placeholder="Example: 28.5"
+                    required
+                >
+
+                <label for="condition">Condition on Arrival</label>
+                <select name="condition" id="condition" required>
+                    <option value="Fresh">Fresh</option>
+                    <option value="Slightly Wilted">Slightly Wilted</option>
+                    <option value="Visibily Damaged">Visibily Damaged</option>
+                </select>
+
+                <button type="submit">+ Add Batch</button>
+
+            </form>
+
+            <a class="back-link" href="{{ url_for('index')}}">
+                ← Back to Dashboard
+            </a>
+                
+        </div>
+    </main>
+
+</body>
+</html>
